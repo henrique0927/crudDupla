@@ -1,5 +1,62 @@
 <?php
 include "database.php";
+
+// Lógica para criação
+if (isset($_POST['create'])) {
+    $nome_professor = $_POST['nome_professor'];
+    $sala = $_POST['sala'];
+    $hora_aula = $_POST['hora_aula'];
+
+    // Inserir novo professor na tabela "professores"
+    $sql_insert_professor = "INSERT INTO professores (nome) VALUES ('$nome_professor')";
+    $conn->query($sql_insert_professor);
+    $professor_id = $conn->insert_id;
+
+    // Inserir nova sala na tabela "aulas"
+    $sql_insert_aula = "INSERT INTO aulas (sala) VALUES ('$sala')";
+    $conn->query($sql_insert_aula);
+    $aula_id = $conn->insert_id;
+
+    // Inserir na tabela "dia_hora" o relacionamento entre o professor, a sala e a hora da aula
+    $sql_insert_dia_hora = "INSERT INTO dia_hora (professor_id, aula_id, hora_aula) VALUES ('$professor_id', '$aula_id', '$hora_aula')";
+    $conn->query($sql_insert_dia_hora);
+
+    header("Location: index.php");
+}
+
+// Lógica para atualização
+if (isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $nome_professor = $_POST['nome_professor'];
+    $sala = $_POST['sala'];
+    $hora_aula = $_POST['hora_aula'];
+
+    // Atualizar o nome do professor na tabela "professores"
+    $sql_update_professor = "UPDATE professores SET nome='$nome_professor' WHERE id=(SELECT professor_id FROM dia_hora WHERE id='$id')";
+    $conn->query($sql_update_professor);
+
+    // Atualizar o nome da sala na tabela "aulas"
+    $sql_update_aula = "UPDATE aulas SET sala='$sala' WHERE id=(SELECT aula_id FROM dia_hora WHERE id='$id')";
+    $conn->query($sql_update_aula);
+
+    // Atualizar a hora da aula na tabela "dia_hora"
+    $sql_update_dia_hora = "UPDATE dia_hora SET hora_aula='$hora_aula' WHERE id='$id'";
+    $conn->query($sql_update_dia_hora);
+
+    header("Location: index.php");
+}
+
+// Lógica para exclusão
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    
+    // Remover a entrada da tabela "dia_hora"
+    $sql_delete = "DELETE FROM dia_hora WHERE id='$id'";
+    $conn->query($sql_delete);
+
+    header("Location: index.php");
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -69,61 +126,3 @@ include "database.php";
     </div>
 </body>
 </html>
-
-<?php
-// Lógica para criação
-if (isset($_POST['create'])) {
-    $nome_professor = $_POST['nome_professor'];
-    $sala = $_POST['sala'];
-    $hora_aula = $_POST['hora_aula'];
-
-    // Inserir novo professor na tabela "professores"
-    $sql_insert_professor = "INSERT INTO professores (nome) VALUES ('$nome_professor')";
-    $conn->query($sql_insert_professor);
-    $professor_id = $conn->insert_id;
-
-    // Inserir nova sala na tabela "aulas"
-    $sql_insert_aula = "INSERT INTO aulas (sala) VALUES ('$sala')";
-    $conn->query($sql_insert_aula);
-    $aula_id = $conn->insert_id;
-
-    // Inserir na tabela "dia_hora" o relacionamento entre o professor, a sala e a hora da aula
-    $sql_insert_dia_hora = "INSERT INTO dia_hora (professor_id, aula_id, hora_aula) VALUES ('$professor_id', '$aula_id', '$hora_aula')";
-    $conn->query($sql_insert_dia_hora);
-
-    header("Location: index.php");
-}
-
-// Lógica para atualização
-if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $nome_professor = $_POST['nome_professor'];
-    $sala = $_POST['sala'];
-    $hora_aula = $_POST['hora_aula'];
-
-    // Atualizar o nome do professor na tabela "professores"
-    $sql_update_professor = "UPDATE professores SET nome='$nome_professor' WHERE id=(SELECT professor_id FROM dia_hora WHERE id='$id')";
-    $conn->query($sql_update_professor);
-
-    // Atualizar o nome da sala na tabela "aulas"
-    $sql_update_aula = "UPDATE aulas SET sala='$sala' WHERE id=(SELECT aula_id FROM dia_hora WHERE id='$id')";
-    $conn->query($sql_update_aula);
-
-    // Atualizar a hora da aula na tabela "dia_hora"
-    $sql_update_dia_hora = "UPDATE dia_hora SET hora_aula='$hora_aula' WHERE id='$id'";
-    $conn->query($sql_update_dia_hora);
-
-    header("Location: index.php");
-}
-
-// Lógica para exclusão
-if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
-    
-    // Remover a entrada da tabela "dia_hora"
-    $sql_delete = "DELETE FROM dia_hora WHERE id='$id'";
-    $conn->query($sql_delete);
-
-    header("Location: index.php");
-}
-?>
