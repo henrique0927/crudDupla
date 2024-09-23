@@ -3,7 +3,7 @@ USE crud_dupla;
 
 CREATE TABLE professores (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255) NOT NULL
+    nome_professor VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE aulas (
