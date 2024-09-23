@@ -8,20 +8,24 @@ if (isset($_POST['create'])) {
     $hora_aula = $_POST['hora_aula'];
 
     // Inserir novo professor na tabela "professores"
-    $sql_insert_professor = "INSERT INTO professores (nome) VALUES ('$nome_professor')";
-    $conn->query($sql_insert_professor);
+    $stmt = $conn->prepare("INSERT INTO professores (nome_professor) VALUES (?)");
+    $stmt->bind_param("s", $nome_professor);
+    $stmt->execute();
     $professor_id = $conn->insert_id;
 
     // Inserir nova sala na tabela "aulas"
-    $sql_insert_aula = "INSERT INTO aulas (sala) VALUES ('$sala')";
-    $conn->query($sql_insert_aula);
+    $stmt = $conn->prepare("INSERT INTO aulas (sala) VALUES (?)");
+    $stmt->bind_param("s", $sala);
+    $stmt->execute();
     $aula_id = $conn->insert_id;
 
-    // Inserir na tabela "dia_hora" o relacionamento entre o professor, a sala e a hora da aula
-    $sql_insert_dia_hora = "INSERT INTO dia_hora (professor_id, aula_id, hora_aula) VALUES ('$professor_id', '$aula_id', '$hora_aula')";
-    $conn->query($sql_insert_dia_hora);
+    // Inserir na tabela "dia_hora"
+    $stmt = $conn->prepare("INSERT INTO dia_hora (professor_id, aula_id, hora_aula) VALUES (?, ?, ?)");
+    $stmt->bind_param("iis", $professor_id, $aula_id, $hora_aula);
+    $stmt->execute();
 
     header("Location: index.php");
+    exit();
 }
 
 // Lógica para atualização
@@ -31,19 +35,23 @@ if (isset($_POST['update'])) {
     $sala = $_POST['sala'];
     $hora_aula = $_POST['hora_aula'];
 
-    // Atualizar o nome do professor na tabela "professores"
-    $sql_update_professor = "UPDATE professores SET nome='$nome_professor' WHERE id=(SELECT professor_id FROM dia_hora WHERE id='$id')";
-    $conn->query($sql_update_professor);
+    // Atualizar o nome do professor
+    $stmt = $conn->prepare("UPDATE professores SET nome_professor=? WHERE professor_id=(SELECT professor_id FROM dia_hora WHERE id=?)");
+    $stmt->bind_param("si", $nome_professor, $id);
+    $stmt->execute();
 
-    // Atualizar o nome da sala na tabela "aulas"
-    $sql_update_aula = "UPDATE aulas SET sala='$sala' WHERE id=(SELECT aula_id FROM dia_hora WHERE id='$id')";
-    $conn->query($sql_update_aula);
+    // Atualizar o nome da sala
+    $stmt = $conn->prepare("UPDATE aulas SET sala=? WHERE aula_id=(SELECT aula_id FROM dia_hora WHERE id=?)");
+    $stmt->bind_param("si", $sala, $id);
+    $stmt->execute();
 
-    // Atualizar a hora da aula na tabela "dia_hora"
-    $sql_update_dia_hora = "UPDATE dia_hora SET hora_aula='$hora_aula' WHERE id='$id'";
-    $conn->query($sql_update_dia_hora);
+    // Atualizar a hora da aula
+    $stmt = $conn->prepare("UPDATE dia_hora SET hora_aula=? WHERE id=?");
+    $stmt->bind_param("si", $hora_aula, $id);
+    $stmt->execute();
 
     header("Location: index.php");
+    exit();
 }
 
 // Lógica para exclusão
@@ -51,10 +59,12 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     
     // Remover a entrada da tabela "dia_hora"
-    $sql_delete = "DELETE FROM dia_hora WHERE id='$id'";
-    $conn->query($sql_delete);
+    $stmt = $conn->prepare("DELETE FROM dia_hora WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
 
     header("Location: index.php");
+    exit();
 }
 
 ?>
@@ -92,24 +102,24 @@ if (isset($_GET['delete'])) {
             <tbody>
                 <?php
                 // puxar os pedidos "READ"
-                $sql = "SELECT dh.id, p.nome AS nome_professor, a.sala AS nome_sala, dh.hora_aula 
+                $sql = "SELECT dh.id, p.nome_professor, a.sala, dh.hora_aula 
                         FROM dia_hora dh 
-                        JOIN professores p ON dh.professor_id = p.id 
-                        JOIN aulas a ON dh.aula_id = a.id";
+                        JOIN professores p ON dh.professor_id = p.professor_id 
+                        JOIN aulas a ON dh.aula_id = a.aula_id";
                 $result = $conn->query($sql);
                 while ($row = $result->fetch_assoc()):
                 ?>
                 <tr>
                     <td class="td-data"><?php echo htmlspecialchars($row['id']); ?></td>
                     <td class="td-data"><?php echo htmlspecialchars($row['nome_professor']); ?></td>
-                    <td class="td-data"><?php echo htmlspecialchars($row['nome_sala']); ?></td>
+                    <td class="td-data"><?php echo htmlspecialchars($row['sala']); ?></td>
                     <td class="td-data"><?php echo htmlspecialchars($row['hora_aula']); ?></td>
                     <td>
                         <!-- formulário para atualizar pedido -->
                         <form action="index.php" method="POST" style="display:inline; margin:auto;">
                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
                             <input type="text" name="nome_professor" value="<?php echo htmlspecialchars($row['nome_professor']); ?>" required>
-                            <input type="text" name="sala" value="<?php echo htmlspecialchars($row['nome_sala']); ?>" required>
+                            <input type="text" name="sala" value="<?php echo htmlspecialchars($row['sala']); ?>" required>
                             <input type="datetime-local" name="hora_aula" value="<?php echo htmlspecialchars(date('Y-m-d\TH:i', strtotime($row['hora_aula']))); ?>" required>
                             
                             <div id="botao-junto">
