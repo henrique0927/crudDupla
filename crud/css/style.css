@@ -1,0 +1,104 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #17bbfcd8;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.td-data {
+  text-align: center;
+  width: 100px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  display: flex;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"] {
+  width: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+  margin-top: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+table,
+th,
+td {
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  text-align: center;
+  background-color: #f4f4f4;
+}
+
+.botao-junto {
+  display: block;
+  padding: 10px;
+}
+
+button {
+  margin-top: 5px;
+  font-size: 13px;
+  padding: 10px 10px;
+  border: none;
+  background: #28a745;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #218838;
+}
+
+a.delete {
+  margin-top: 5px;
+  font-size: 13px;
+  color: white;
+  background-color: #dc3545;
+  padding: 10px 10px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+a.delete:hover {
+  background-color: #c82333;
+}
