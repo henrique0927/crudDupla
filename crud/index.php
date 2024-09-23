@@ -9,7 +9,7 @@
   <body>
     <main>
       <div class="form">
-        <form action="">aa</form>
+        <form action=""></form>
       </div>
     </main>
   </body>
