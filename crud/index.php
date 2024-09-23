@@ -1,25 +1,25 @@
 <?php
 include "database.php";
 
-// Lógica para criação
+// CREATE
 if (isset($_POST['create'])) {
     $nome_professor = $_POST['nome_professor'];
     $sala = $_POST['sala'];
     $hora_aula = $_POST['hora_aula'];
 
-    // Inserir novo professor na tabela "professores"
+    
     $stmt = $conn->prepare("INSERT INTO professores (nome_professor) VALUES (?)");
     $stmt->bind_param("s", $nome_professor);
     $stmt->execute();
     $professor_id = $conn->insert_id;
 
-    // inserir nova sala na tabela "aulas"
+    
     $stmt = $conn->prepare("INSERT INTO aulas (sala) VALUES (?)");
     $stmt->bind_param("s", $sala);
     $stmt->execute();
     $aula_id = $conn->insert_id;
 
-    // inserir na tabela "dia_hora"
+    
     $stmt = $conn->prepare("INSERT INTO dia_hora (professor_id, aula_id, hora_aula) VALUES (?, ?, ?)");
     $stmt->bind_param("iis", $professor_id, $aula_id, $hora_aula);
     $stmt->execute();
@@ -35,17 +35,16 @@ if (isset($_POST['update'])) {
     $sala = $_POST['sala'];
     $hora_aula = $_POST['hora_aula'];
 
-    // Atualizar o nome do professor
+
     $stmt = $conn->prepare("UPDATE professores SET nome_professor=? WHERE professor_id=(SELECT professor_id FROM dia_hora WHERE id=?)");
     $stmt->bind_param("si", $nome_professor, $id);
     $stmt->execute();
 
-    // Atualizar o nome da sala
+
     $stmt = $conn->prepare("UPDATE aulas SET sala=? WHERE aula_id=(SELECT aula_id FROM dia_hora WHERE id=?)");
     $stmt->bind_param("si", $sala, $id);
     $stmt->execute();
 
-    // Atualizar a hora da aula
     $stmt = $conn->prepare("UPDATE dia_hora SET hora_aula=? WHERE id=?");
     $stmt->bind_param("si", $hora_aula, $id);
     $stmt->execute();
@@ -54,11 +53,10 @@ if (isset($_POST['update'])) {
     exit();
 }
 
-// Lógica para exclusão
+// DELETE
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    
-    // Remover a entrada da tabela "dia_hora"
+
     $stmt = $conn->prepare("DELETE FROM dia_hora WHERE id=?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -101,7 +99,7 @@ if (isset($_GET['delete'])) {
             </thead>
             <tbody>
                 <?php
-                // puxar os pedidos READ
+                // READ
                 $sql = "SELECT dh.id, p.nome_professor, a.sala, dh.hora_aula 
                         FROM dia_hora dh 
                         JOIN professores p ON dh.professor_id = p.professor_id 
